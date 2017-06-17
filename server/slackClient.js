@@ -1,13 +1,15 @@
 const { RtmClient, CLIENT_EVENTS, RTM_EVENTS, IncomingWebhook } = require('@slack/client');
-require('dotenv').config()
+require('dotenv').config();
+const axios = require('axios');
 
 
 let rtm = null;
 const url = process.env.SLACK_WEBHOOK_URL || ''; 
 const webhook = new IncomingWebhook(url);
-var WebClient = require('@slack/client').WebClient;
-var token = process.env.SLACK_GENDER_WHAT_TOKEN || '';
-var web = new WebClient(token);
+const WebClient = require('@slack/client').WebClient;
+const token = process.env.SLACK_GENDER_WHAT_TOKEN || '';
+const web = new WebClient(token);
+const authToken = process.env.SLACK_AUTH
 
 
 
@@ -16,6 +18,7 @@ const handleOnAuthenticated = (rtmStartData) => {
 };
 
 const handleOnMessage = (nlp, message) => {
+  console.log("=====================",message)
   //check to see if message is not coming from a bot
   if(!message.bot_id) {
     // nlp === witClient
@@ -37,6 +40,7 @@ const handleOnMessage = (nlp, message) => {
           }
           // return rtm.sendMessage(response, message.channel);
           const config = {
+            "icon_emoji": ":smile:",
             attachments: [
               {
                 "title": response.question,
@@ -56,24 +60,24 @@ const handleOnMessage = (nlp, message) => {
             ]
           }
           const params = {}
-          const array = JSON.stringify([{"text": "hello"}])
+          const array = JSON.stringify([{"pretext": "pre-hello", "text": "text-world"}])
+
           params.attachments = array;
-
-
-          return web.chat.postMessage(message.channel, params,  function(err, res) {
-            if (err) {
-              console.log('Error:', err);
-            } else {
-              console.log('Message sent: ', res);
-            }
-          });
-          // return webhook.send(config, function(err, res) {
+          // rtm.sendMesssage()
+          // return web.chat.postMessage(message.channel, {"text": "hello"},  function(err, res) {
           //   if (err) {
           //     console.log('Error:', err);
           //   } else {
           //     console.log('Message sent: ', res);
           //   }
           // });
+          return webhook.send(config, function(err, res) {
+            if (err) {
+              console.log('Error:', err);
+            } else {
+              console.log('Message sent: ', res);
+            }
+          });
         })
     });
   }
@@ -88,10 +92,22 @@ const addAuthentiatedHandler = (rtm, handler) => {
 module.exports.init = function slackClient(token, logLevel, nlp, app) {
   rtm = new RtmClient(token, { logLevel });
   app.post('/updateMessage', (req, res) => {
-    console.log("================",req.body);
-    res.status(200).send({
-      replace_original: true,
+    const body = JSON.parse(req.body.payload);
+    const msg = {};
+    msg.ts = body.message_ts;
+    msg.channel = body.channel.id;
+    console.log(body.original_message.attachments[0])
+    msg.text = body.original_message.attachments[0].title;
+    msg.bot_access_token = token;
+    msg.bot_user_id = 'B5V81UYDR';
+    msg.as_user = true;
+    console.log(msg)
+    rtm.updateMessage(msg, (err, res) => {
+      console.log("err",err)
     })
+    // res.status(200).send({
+    //   replace_original: true,
+    // })
     // axios.post(req.body.response_url, {})
   })
   addAuthentiatedHandler(rtm, handleOnAuthenticated);
