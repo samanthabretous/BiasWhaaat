@@ -1,6 +1,4 @@
-const { RtmClient } = require('@slack/client');
-const { CLIENT_EVENTS } = require('@slack/client');
-const { RTM_EVENTS } = require('@slack/client');
+const { RtmClient, CLIENT_EVENTS, RTM_EVENTS } = require('@slack/client');
 
 let rtm = null;
 
@@ -9,31 +7,26 @@ const handleOnAuthenticated = (rtmStartData) => {
 };
 
 const handleOnMessage = (nlp, message) => {
-    // npl === witClient
-    nlp.ask(message.text, (err, res) => {
-      if (err) {
-        console.log(err);
-        return;
+  // nlp === witClient
+  nlp.ask(message.text, (err, res) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+      if (!res || !res.bias) {
+        throw new Error('Could not extract bias.');
       }
-      try {
-        if (!res || !res.bias) {
-          throw new Error('Could not extract bias.');
+
+      const intent = require(`./intents/bias`);
+
+      intent.process(res, message.text, (error, response) => {
+        if (error) {
+          console.log(error.message);
+          return;
         }
-
-        const intent = require(`./intents/bias`);
-
-        intent.process(res, (error, response) => {
-          if (error) {
-            console.log(error.message);
-            return;
-          }
-          return rtm.sendMessage(response, message.channel);
-        })
-      } catch (error) {
-        console.log(error);
-        rtm.sendMessage("Sorry, I don't catch what you are talking about!", message.channel);
-      }
-    });
+        return rtm.sendMessage(response, message.channel);
+      })
+  });
 };
 
 const addAuthentiatedHandler = (rtm, handler) => {
