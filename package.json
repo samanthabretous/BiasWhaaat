@@ -1,0 +1,28 @@
+{
+  "name": "shut-up-tom",
+  "version": "1.0.0",
+  "description": "A application that tells the room the sound levels",
+  "license": "MIT",
+  "repository": "github.com/ryanbaer/simple-electron-app",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.2.0"
+  },
+  "dependencies": {
+    "@slack/client": "^3.9.0",
+    "body-parser": "^1.17.2",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.2",
+    "handlebars": "^4.0.8",
+    "nodemon": "^1.11.0",
+    "request": "^2.81.0",
+    "socket.io": "^2.0.1",
+    "superagent": "^3.5.2"
+  },
+  "main": "app/main.js",
+  "scripts": {
+    "build-osx": "electron-packager . Example --platform=darwin --arch=x64 --version=0.36.0 --icon=Icon.icns",
+    "start": "nodemon start.js"
+  }
+}
