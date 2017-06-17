@@ -47,7 +47,7 @@ const handleOnMessage = (nlp, message) => {
                   {
                     "name": "fixed",
                     "text": "Yes, change!",
-                    "style": "danger",
+                    "style": "primary",
                     "type": "button",
                     "value": "war",
                   }
@@ -55,23 +55,25 @@ const handleOnMessage = (nlp, message) => {
               }
             ]
           }
+          const params = {}
+          const array = JSON.stringify([{"text": "hello"}])
+          params.attachments = array;
 
-          // return web.chat.postMessage(message.channel, {
-          //   attachments: [{"text": "hello"}]
-          // },  function(err, res) {
-          //   if (err) {
-          //     console.log('Error:', err);
-          //   } else {
-          //     console.log('Message sent: ', res);
-          //   }
-          // });
-          return webhook.send(config, function(err, res) {
+
+          return web.chat.postMessage(message.channel, params,  function(err, res) {
             if (err) {
               console.log('Error:', err);
             } else {
               console.log('Message sent: ', res);
             }
           });
+          // return webhook.send(config, function(err, res) {
+          //   if (err) {
+          //     console.log('Error:', err);
+          //   } else {
+          //     console.log('Message sent: ', res);
+          //   }
+          // });
         })
     });
   }
@@ -87,7 +89,9 @@ module.exports.init = function slackClient(token, logLevel, nlp, app) {
   rtm = new RtmClient(token, { logLevel });
   app.post('/updateMessage', (req, res) => {
     console.log("================",req.body);
-    res.status(200).send({attachments: [{"text": "message"}]})
+    res.status(200).send({
+      replace_original: true,
+    })
     // axios.post(req.body.response_url, {})
   })
   addAuthentiatedHandler(rtm, handleOnAuthenticated);
