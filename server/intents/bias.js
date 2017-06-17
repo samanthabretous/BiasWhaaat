@@ -15,7 +15,9 @@ module.exports.process = function process(biasData, message, cb) {
   }
 };
 const biasWords = {
-  "businessman": ["business", "executive", "entrepreneur"],
+  "guys":["everyone"]
+  "girls": ["women"],
+  "businessman": ["executive", "entrepreneur"],
   "career girl": ["professional", "manager", "executive" ],
   "career woman": ["professional", "manager", "executive" ],
   "cleaning lady": ["cleaner"],
